@@ -12,6 +12,10 @@ import com.lvzhonghou.Prophet.MapTaskParameters;
 import com.lvzhonghou.Prophet.PerformanceModel;
 import com.lvzhonghou.Prophet.ReduceTaskParameters;
 import com.lvzhonghou.StatisticsEstimate.StatisticsPredictor;
+import com.lvzhonghou.common.MapCostStatistics;
+import com.lvzhonghou.common.MapStatistics;
+import com.lvzhonghou.common.ReduceCostStatistics;
+import com.lvzhonghou.common.ReduceStatistics;
 import com.lvzhonghou.common.Statistics;
 
 /**
@@ -28,7 +32,8 @@ public class JobOptimizer {
 	mapParameters = new MapTaskParameters();
 	reduceParameters = new ReduceTaskParameters();
     }
-
+    
+    // obtain the iteration cells
     public IterationCell[] getIterationCells(int inputSize, int tradeoffParas,
 	    ClusterConf clusterConf) {
 	IterationCell[] iterations = new IterationCell[tradeoffParas];
@@ -71,7 +76,86 @@ public class JobOptimizer {
 
 	return iterations;
     }
-
+    
+    // print the optimization result
+    public static void printOpt(MapTaskParameters mapOpt, ReduceTaskParameters reduceOpt) {
+	// print the optimized parameters
+	System.out.println("the optimized parameters are shown as follows: ");
+	System.out.println("mapTask's pSplitSize is "
+		+ mapOpt.pSplitSize);
+	System.out.println("mapTask's pSpillPerc is "
+		+ mapOpt.pSpillPerc);
+	System.out.println("mapTask's pSortFactor is "
+		+ mapOpt.pSortFactor);
+	System.out.println("mapTask's pNumSpillForComb is "
+		+ mapOpt.pNumSpillForComb);
+	System.out.println("reduceTask's pSortFactor is "
+		+ reduceOpt.pSortFactor);
+	System.out.println("reduceTask's pSingleShuffleMemoryLimitPercent is "
+		+ reduceOpt.pSingleShuffleMemoryLimitPercent);
+	System.out.println("reduceTask's pMergeThresholdPercent is "
+		+ reduceOpt.pMergeThresholdPercent);
+	System.out.println("reduceTask's pCopyThread is "
+		+ reduceOpt.pCopyThread);
+	System.out.println("reduceTask's pNumReduce is "
+		+ reduceOpt.pNumReduce);
+    }
+    
+    // print the statistics predicted by the predictor 
+    public static void printStatis(Statistics statis) {
+	System.out.println("the predicted statistics are shown as follows: ");
+	
+	String host = statis.hostName;
+	System.out.println("the host name is " + host);
+	
+	MapStatistics mapStatis = statis.mapStatistics;
+	ReduceStatistics reduceStatis = statis.reduceStatistics;
+	
+	MapCostStatistics mapCostStatis = mapStatis.costStat;
+	ReduceCostStatistics reduceCostStatis = reduceStatis.reduceCostStatistics;
+	
+	System.out.println("the map cost statistics are shown as follows.");
+	System.out.println("the map's csScheduleCost is " + mapCostStatis.csScheduleCost);
+	System.out.println("the map's  csInitialCost is " + mapCostStatis.csInitialCost);
+	System.out.println("the map's hdfsReadRate is " + mapCostStatis.hdfsReadRate);
+	System.out.println("the map's ioReadRate is " + mapCostStatis.ioReadRate);
+	System.out.println("the map's csReadCost is " + mapCostStatis.csReadCost);
+	System.out.println("the map's csMapCost is " + mapCostStatis.csMapCost);
+	System.out.println("the map's csMapCostWithSpill is " + mapCostStatis.csMapCostWithSpill);
+	System.out.println("the map's csSortCost is " + mapCostStatis.csSortCost);
+	System.out.println("the map's csCombineCost is " + mapCostStatis.csCombineCost);
+	System.out.println("the map's csCombineReadCost is " + mapCostStatis.csCombineReadCost);
+	System.out.println("the map's csCombineWriteCost is " + mapCostStatis.csCombineWriteCost);
+	System.out.println("the map's csMergeReadCost is " + mapCostStatis.csMergeReadCost);
+	System.out.println("the map's csMergeCombineCost is " + mapCostStatis.csMergeCombineCost);
+	System.out.println("the map's csMergeWriteCost is " + mapCostStatis.csMergeWriteCost);
+	
+	
+	System.out.println("-------------------------------");
+	System.out.println("the reduce cost statistics are shown as follows.");
+	System.out.println("the reduce's csSheduleCost is " + reduceCostStatis.csSheduleCost);
+	System.out.println("the reduce's initialCost is " + reduceCostStatis.initialCost);
+	System.out.println("the reduce's csShuffleInMem is " + reduceCostStatis.csShuffleInMem);
+	System.out.println("the reduce's csShuffleOnDisk is " + reduceCostStatis.csShuffleOnDisk);
+	System.out.println("the reduce's csShuffleMemToDiskMerge is " + reduceCostStatis.csShuffleMemToDiskMerge);
+	System.out.println("the reduce's csShuffleMemToDiskCombine is " + reduceCostStatis.csShuffleMemToDiskCombine);
+	System.out.println("the reduce's csShuffleMemToDiskWrite is " + reduceCostStatis.csShuffleMemToDiskWrite);
+	System.out.println("the reduce's csShuffleDiskToDiskMerge is " + reduceCostStatis.csShuffleDiskToDiskMerge);
+	System.out.println("the reduce's csShuffleDiskToDiskWrite is " + reduceCostStatis.csShuffleDiskToDiskWrite);
+	System.out.println("the reduce's csImeMemToDiskMerge is " + reduceCostStatis.csImeMemToDiskMerge);
+	System.out.println("the reduce's csImeMemToDiskCombine is " + reduceCostStatis.csImeMemToDiskCombine);
+	System.out.println("the reduce's csImeMemToDiskWrite is " + reduceCostStatis.csFinalMemToDiskWrite);
+	System.out.println("the reduce's csImeDiskToDiskMerge is " + reduceCostStatis.csImeDiskToDiskMerge);
+	System.out.println("the reduce's csImeDiskToDiskWrite is " + reduceCostStatis.csImeDiskToDiskWrite);
+	System.out.println("the reduce's csFinalMemToDiskMerge is " + reduceCostStatis.csFinalMemToDiskMerge);
+	System.out.println("the reduce's csFinalMemToDiskWrite is " + reduceCostStatis.csFinalMemToDiskWrite);
+	System.out.println("the reduce's csFinalDiskToDiskMerge is " + reduceCostStatis.csFinalDiskToDiskMerge);
+	System.out.println("the reduce's csReduce is " + reduceCostStatis.csReduce);
+	System.out.println("the reduce's csHdfsWrite is " + reduceCostStatis.csHdfsWrite);
+    }
+    
+    
+    
     /**
      * @Description
      * @param args
@@ -86,16 +170,16 @@ public class JobOptimizer {
 	for (int i = 0; i < args.length; i++)
 	    paths[i] = args[i] + ".txt";
 
-	// statisArrs represents all the statistics of various files, one
-	// element of the statisArrs is one job's statistics
-	List<ArrayList<Statistics>> statisArrs = new ArrayList<ArrayList<Statistics>>();
+	// jobsStatis represents all the statistics of various files, one
+	// element of the jobsStatis is one job's statistics
+	List<ArrayList<Statistics>> jobsStatis = new ArrayList<ArrayList<Statistics>>();
 	try {
 	    for (String path : paths) {
 		ObjectInputStream is = new ObjectInputStream(
 			new FileInputStream(path));
 		ArrayList<Statistics> statistics = (ArrayList<Statistics>) is
 			.readObject();
-		statisArrs.add(statistics);
+		jobsStatis.add(statistics);
 	    }
 	} catch (FileNotFoundException e) {
 	    // TODO Auto-generated catch block
@@ -108,21 +192,24 @@ public class JobOptimizer {
 	    e.printStackTrace();
 	}
 
-	// reset the statisArrs, all the statisArrs of the same hostName are set
+	// reset the jobsStatis, all the jobsStatis of the same hostName are set
 	// in the same list
-	List<ArrayList<Statistics>> statisList = new ArrayList<ArrayList<Statistics>>();
-	for (Statistics statis : statisArrs.get(0)) {
-	    ArrayList<Statistics> statisListOneHost = new ArrayList<Statistics>();
-	    statisListOneHost.add(statis);
-	    statisList.add(statisListOneHost);
+	List<ArrayList<Statistics>> hostsStatis = new ArrayList<ArrayList<Statistics>>();
+	for (Statistics statis : jobsStatis.get(0)) {
+	    ArrayList<Statistics> hostStatis = new ArrayList<Statistics>();
+	    hostStatis.add(statis);
+	    hostsStatis.add(hostStatis);
 	}
-	for (int i = 1; i < statisArrs.size(); i++) {
+	for (int i = 1; i < jobsStatis.size(); i++) {
+	    if (i >= jobsStatis.size())
+		break;
+
 	    // traverse the statisArrs
-	    for (Statistics statis : statisArrs.get(i)) {
+	    for (Statistics statis : jobsStatis.get(i)) {
 		String hostName = statis.hostName;
-		for (ArrayList<Statistics> statisListOneHost : statisList) {
-		    if (hostName.equals(statisListOneHost.get(0).hostName)) {
-			statisListOneHost.add(statis);
+		for (ArrayList<Statistics> hostStatis : hostsStatis) {
+		    if (hostName.equals(hostStatis.get(0).hostName)) {
+			hostStatis.add(statis);
 			break;
 		    }
 		}
@@ -164,6 +251,8 @@ public class JobOptimizer {
 	double minJobCost = 0;
 	MapTaskParameters mapParametersOpt = new MapTaskParameters();
 	ReduceTaskParameters reduceParametersOpt = new ReduceTaskParameters();
+	
+	int iterationNums = 0;
 	for (jobOptimizer.mapParameters.pSplitSize = iterations[0].start; jobOptimizer.mapParameters.pSplitSize <= iterations[0].end; jobOptimizer.mapParameters.pSplitSize += iterations[0].interval) {
 	    for (jobOptimizer.mapParameters.pSpillPerc = iterations[1].start; jobOptimizer.mapParameters.pSpillPerc <= iterations[1].end; jobOptimizer.mapParameters.pSpillPerc += iterations[1].interval) {
 		for (jobOptimizer.mapParameters.pSortFactor = iterations[2].start; jobOptimizer.mapParameters.pSortFactor <= iterations[2].end; jobOptimizer.mapParameters.pSortFactor += iterations[2].interval) {
@@ -173,21 +262,28 @@ public class JobOptimizer {
 			    for (jobOptimizer.reduceParameters.pMergeThresholdPercent = iterations[5].start; jobOptimizer.reduceParameters.pMergeThresholdPercent <= iterations[5].end; jobOptimizer.reduceParameters.pSingleShuffleMemoryLimitPercent += iterations[5].interval) {
 				for (jobOptimizer.reduceParameters.pCopyThread = iterations[6].start; jobOptimizer.reduceParameters.pCopyThread <= iterations[6].end; jobOptimizer.reduceParameters.pCopyThread += iterations[6].interval) {
 				    for (jobOptimizer.reduceParameters.pNumReduce = iterations[7].start; jobOptimizer.reduceParameters.pNumReduce <= iterations[7].end; jobOptimizer.reduceParameters.pNumReduce += iterations[7].interval) {
+					
+					System.out.println("the number of iteration is " + iterationNums);
+					
 					List<Statistics> statisActualList = new ArrayList<Statistics>();
-					for (ArrayList<Statistics> statisListOneHost : statisList) {
+					for (ArrayList<Statistics> hostStatis : hostsStatis) {
 					    Statistics statisActual = statisticsPredictor
 						    .statisticsPredict(
-							    statisListOneHost,
+							    hostStatis,
 							    jobOptimizer.mapParameters,
 							    jobOptimizer.reduceParameters);
+					    
+					    printStatis(statisActual);
 					    statisActualList.add(statisActual);
 					}
+					System.out.println("--------------------------------");
 					double curJobCost = performanceModel
 						.jobCost(
 							statisActualList,
 							jobOptimizer.mapParameters,
 							jobOptimizer.reduceParameters,
 							inputSize, clusterConf);
+					System.out.println("current job cost is " + curJobCost);
 					if (minJobCost == 0
 						|| minJobCost > curJobCost) {
 					    minJobCost = curJobCost;
@@ -209,18 +305,9 @@ public class JobOptimizer {
 		}
 	    }
 	}
-	
-	// print the mapParamtersOpt
-	System.out.println("the optimized parameters are shown as follows: ");
-	System.out.println("mapTask's pSplitSize is " + mapParametersOpt.pSplitSize);
-	System.out.println("mapTask's pSpillPerc is " + mapParametersOpt.pSpillPerc);
-	System.out.println("mapTask's pSortFactor is " + mapParametersOpt.pSortFactor);
-	System.out.println("mapTask's pNumSpillForComb is " + mapParametersOpt.pNumSpillForComb);
-	System.out.println("reduceTask's pSortFactor is " + reduceParametersOpt.pSortFactor);
-	System.out.println("reduceTask's pSingleShuffleMemoryLimitPercent is " + reduceParametersOpt.pSingleShuffleMemoryLimitPercent);
-	System.out.println("reduceTask's pMergeThresholdPercent is " + reduceParametersOpt.pMergeThresholdPercent);
-	System.out.println("reduceTask's pCopyThread is " + reduceParametersOpt.pCopyThread);
-	System.out.println("reduceTask's pNumReduce is " + reduceParametersOpt.pNumReduce);
+
+	// print the optimized parameters
+	printOpt(mapParametersOpt, reduceParametersOpt);
     }
 
 }

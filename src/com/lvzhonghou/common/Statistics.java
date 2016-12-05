@@ -27,13 +27,5 @@ public class Statistics implements Serializable {
     
     // map and reduce parameters
     public MapTaskParameters mapParameters = null;
-    public ReduceTaskParameters reduceParameters = null;
-    
-    /**
-     * Description 
-     * @param o
-     * @return 
-     * @see java.lang.Comparable#compareTo(java.lang.Object) 
-     */ 
-    	
+    public ReduceTaskParameters reduceParameters = null;	
 }
