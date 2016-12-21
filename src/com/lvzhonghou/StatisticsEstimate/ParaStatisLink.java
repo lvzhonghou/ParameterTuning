@@ -64,7 +64,7 @@ public class ParaStatisLink {
 	// active parameters, no-tradeoff parameters and active statistics
 	String[] activeParameters = new String[] { "pSortFactor", "pCopyThread" };
 	String[] noTradeOffParas = new String[] { "pSortMB", "pIsCombine",
-		"pTotalMemorySize", "pReduceInBufPerc", "pHaveCombiner" };
+		"pTotalMemorySize", "pReduceInBufPerc", "pHaveCombiner" }; // 暂时不去调整的参数
 	String[] activeStatistics = new String[] { "csMergeReadCost",
 		"csMergeCombineCost", "csMergeWriteCost",
 		"csShuffleDiskToDiskMerge", "csShuffleDiskToDiskWrite",
@@ -93,16 +93,18 @@ public class ParaStatisLink {
 	String[] mapandreduceParas = commonStrs(mapParas, reduceParas);
 	parameters = new ArrayList<Parameter>();
 	// add the map and reduce task parameters
-	for (String para : mapandreduceParas) {
-	    boolean isActive = isContain(para, activeParameters);
-	    boolean isTradeOff = !isContain(para, noTradeOffParas);
-	    Parameter parameter = new Parameter(para, MapOrReduce.mapandreduce,
-		    isTradeOff, isActive);
-	    parameters.add(parameter);
+	if (mapandreduceParas != null) {
+	    for (String para : mapandreduceParas) {
+		boolean isActive = isContain(para, activeParameters);
+		boolean isTradeOff = !isContain(para, noTradeOffParas);
+		Parameter parameter = new Parameter(para,
+			MapOrReduce.mapandreduce, isTradeOff, isActive);
+		parameters.add(parameter);
+	    }
 	}
 	// add the map task parameters
 	for (String para : mapParas) {
-	    if(isContain(para, mapandreduceParas))
+	    if (isContain(para, mapandreduceParas))
 		continue;
 	    boolean isActive = isContain(para, activeParameters);
 	    boolean isTradeOff = !isContain(para, noTradeOffParas);
@@ -112,7 +114,7 @@ public class ParaStatisLink {
 	}
 	// add the reduce task parameters
 	for (String para : reduceParas) {
-	    if(isContain(para, mapandreduceParas))
+	    if (isContain(para, mapandreduceParas))
 		continue;
 	    boolean isActive = isContain(para, activeParameters);
 	    boolean isTradeOff = !isContain(para, noTradeOffParas);
@@ -129,15 +131,12 @@ public class ParaStatisLink {
 		.getPropertyNames(ReduceCostStatistics.class);
 	String[] reduceDataflowStatis = ReflectionTool
 		.getPropertyNames(ReduceDataFlowStatistics.class);
-	String[] removeStatis = new String[] { "serialVersionUID" }; // 需要去除的属性
+	
 	// init the inactiveStatis and activeStatis
 	inactiveStatis = new ArrayList<Statistic>();
 	activeStatis = new ArrayList<Statistic>();
 	// add the map cost statistics
 	for (String statis : mapCostStatis) {
-	    if (isContain(statis, removeStatis))
-		continue;
-
 	    Statistic statistic = null;
 	    boolean isActive = isContain(statis, activeStatistics);
 	    if (isActive) {
@@ -152,9 +151,6 @@ public class ParaStatisLink {
 	}
 	// add the map dataflow statistics
 	for (String statis : mapDataflowStatis) {
-	    if (isContain(statis, removeStatis))
-		continue;
-
 	    Statistic statistic = null;
 	    boolean isActive = isContain(statis, activeStatistics);
 	    if (isActive) {
@@ -169,9 +165,6 @@ public class ParaStatisLink {
 	}
 	// add the reduce cost statistics
 	for (String statis : reduceCostStatis) {
-	    if (isContain(statis, removeStatis))
-		continue;
-
 	    Statistic statistic = null;
 	    boolean isActive = isContain(statis, activeStatistics);
 	    if (isActive) {
@@ -186,9 +179,6 @@ public class ParaStatisLink {
 	}
 	// add the reduce dataflow statistics
 	for (String statis : reduceDataflowStatis) {
-	    if (isContain(statis, removeStatis))
-		continue;
-
 	    Statistic statistic = null;
 	    boolean isActive = isContain(statis, activeStatistics);
 	    if (isActive) {
@@ -211,23 +201,23 @@ public class ParaStatisLink {
 
 	    // search the paraStr from the parameters
 	    Parameter para = null;
-	    for(Parameter parameter : parameters) {
-		if(paraStr.equals(parameter.paraName)) {
+	    for (Parameter parameter : parameters) {
+		if (paraStr.equals(parameter.paraName)) {
 		    para = parameter;
 		    break;
 		}
 	    }
 	    // search the statistics from the activeStatistics
 	    ArrayList<Statistic> statistics = new ArrayList<Statistic>();
-	    for(String statisStr : statisStrs) {
-		for(Statistic statis : activeStatis) {
-		    if(statisStr.equals(statis.name)) {
+	    for (String statisStr : statisStrs) {
+		for (Statistic statis : activeStatis) {
+		    if (statisStr.equals(statis.name)) {
 			statistics.add(statis);
 			break;
 		    }
 		}
 	    }
-	    
+
 	    paraStatisMap.put(para, statistics);
 	}
 

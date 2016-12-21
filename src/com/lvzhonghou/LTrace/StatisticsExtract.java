@@ -73,16 +73,18 @@ public class StatisticsExtract {
     }
 
     public static void extractParameters() {
-	// extract the mapTaskParameters
+	// extract the mapTask's Parameters
 	double mSize = 1024 * 1024;   // the byte amount of 1 MB
 	mapParameters.pSplitSize = mapTraces.get(0).inputFileSize * 1.0 / mSize;
 	mapParameters.pSortMB = mapTraces.get(0).sortMB * 1.0;  // MB
 	mapParameters.pSpillPerc = (mapTraces.get(0).sortLimit * 1.0)
 		/ (mapTraces.get(0).sortMB * mSize) ;
-
+	
 	mapParameters.pSortFactor = mapTraces.get(0).sortFactor * 1.0;
 	mapParameters.pNumSpillForComb = mapTraces.get(0).numSpillForComb * 1.0;
-
+	
+	// extract the reduceTask's Parameters
+	reduceParameters.pTotalMemorySize=reduceTraces.get(0).memoryLimit;
 	// calculate the pCopyThread
 	List<ShuffleInfo> shuffles = reduceTraces.get(0).shuffles;
 	HashMap<String, Integer> copyThreads = new HashMap<String, Integer>();
@@ -99,6 +101,7 @@ public class StatisticsExtract {
     public static Statistics extractStatistics(String[] filePaths,
 	    int mapInputSize) {
 	// extract and output the start and end of all the log files
+	// to separately extract the schedule costs of map and reduce tasks
 	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss,SSS");
 	List<String> mapLogs = new ArrayList<String>();
 	List<String> reduceLogs = new ArrayList<String>();
@@ -114,14 +117,8 @@ public class StatisticsExtract {
 		}
 	    }
 	}
-	List<TaskSEPoint> taskSEPoints = new ArrayList<TaskSEPoint>(); // records
-								       // the
-								       // start
-								       // and
-								       // end of
-								       // all
-								       // the
-								       // tasks
+	List<TaskSEPoint> taskSEPoints = new ArrayList<TaskSEPoint>(); // records the start and end of all the tasks
+								       
 	for (String mapLog : mapLogs) {
 	    TaskSEPoint task = new TaskSEPoint();
 	    task.mapOrReduce = MapOrReduce.map;
@@ -172,7 +169,7 @@ public class StatisticsExtract {
 	Collections.sort(S1);
 	Collections.sort(S2);
 
-	List<Long> scheduleCosts = new ArrayList<Long>();
+	List<Long> scheduleCosts = new ArrayList<Long>();  // ms
 	for (TaskSEPoint task2 : S2) {
 	    if (S1.size() == 0)
 		break;
@@ -184,7 +181,7 @@ public class StatisticsExtract {
 
 	    if (S1.size() != 0) {
 		long scheduleCost = S1.get(0).start.getTime()
-			- task2.end.getTime();
+			- task2.end.getTime();  // ms
 		scheduleCosts.add(scheduleCost);
 		S1.remove(0);
 	    }
@@ -266,9 +263,15 @@ public class StatisticsExtract {
 		for (String ff : reduceFiles)
 		    reduces[i++] = ff;
 		extractReduceStatistic(reduces);
-		reduceStatistic.reduceCostStatistics.csSheduleCost = scheduleCostAVG;
+		reduceStatistic.reduceCostStatistics.csScheduleCost = scheduleCostAVG;
 		statistics.reduceStatistics = reduceStatistic;
 	    }
+	    
+	    // print the csScheduleCost
+	    System.out.println("---------------------------!!!!!!!!");
+	    System.out.println("the map tasks' schedule cost is " + mapStatistic.costStat.csScheduleCost);
+	    System.out.println("the reduce tasks' schedule cost is " + reduceStatistic.reduceCostStatistics.csScheduleCost);
+	    
 	}
 
 	// extract the parameters from the first mapTrace or 

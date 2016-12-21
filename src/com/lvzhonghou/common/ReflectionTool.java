@@ -1,6 +1,9 @@
 package com.lvzhonghou.common;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.List;
 
 /** 
  * @Description 
@@ -15,6 +18,7 @@ public class ReflectionTool {
 	Object property = null;
 	try {
 	    field = ownerClass.getField(fieldName);
+	    
 	    property = field.get(owner);
 	} catch (NoSuchFieldException e) {
 	    // TODO Auto-generated catch block
@@ -35,11 +39,17 @@ public class ReflectionTool {
     
     public static String[] getPropertyNames(Class clazz) {
 	Field[] fields = clazz.getDeclaredFields();
-	String[] properties = new String[fields.length];
+	// String[] properties = new String[fields.length];
+	List<String> noStaticPropers = new ArrayList<String>();
 	
 	for(int i = 0; i < fields.length; i++) {
-	    properties[i] = fields[i].getName();
+	    if(!Modifier.isStatic(fields[i].getModifiers())) {
+		noStaticPropers.add(fields[i].getName());
+	    }
 	}
+	
+	String[] properties = new String[noStaticPropers.size()];
+	noStaticPropers.toArray(properties);
 	return properties;
     }
 }

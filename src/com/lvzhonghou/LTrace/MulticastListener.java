@@ -20,6 +20,7 @@ public class MulticastListener {
     private int port;
     private String host;
     private static final int splitSize = 128;
+    private static final String masterHost = "192.168.7.125";
 
     public MulticastListener(String host, int port) {
 	this.host = host;
@@ -32,7 +33,7 @@ public class MulticastListener {
 	System.out.println("the map task's schedule cost is "
 		+ statis.mapStatistics.costStat.csScheduleCost);
 	System.out.println("the reduce task's schedule cost is "
-		+ statis.reduceStatistics.reduceCostStatistics.csSheduleCost);
+		+ statis.reduceStatistics.reduceCostStatistics.csScheduleCost);
 
     }
 
@@ -83,10 +84,11 @@ public class MulticastListener {
 
 	    // send the statistics
 	    String hostName = InetAddress.getLocalHost().getHostName();
-	    Client client = new Client("192.168.7.102", 2345);
+	    Client client = new Client(masterHost, 2345);
 
 	    if (statistics != null) {
 		statistics.hostName = hostName;
+		
 	    } else {
 		statistics = new Statistics();
 		statistics.isEmpty = true;

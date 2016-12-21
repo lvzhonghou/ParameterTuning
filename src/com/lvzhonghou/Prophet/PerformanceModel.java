@@ -1448,7 +1448,7 @@ public class PerformanceModel {
 	    jobCostsAllNode[i] = (mapOutsOneSlave.get(0).mapCost + mapOutsOneSlave
 		    .get(0).mapScheduleCost)
 		    * mapOutsOneSlave.size()
-		    + (reduceCosts[reduceId] + reduceStatistics.get(reduceId).reduceCostStatistics.csSheduleCost)
+		    + (reduceCosts[reduceId] + reduceStatistics.get(reduceId).reduceCostStatistics.csScheduleCost)
 		    * reduceWaves;
 
 	}
@@ -1608,7 +1608,7 @@ public class PerformanceModel {
 	    jobCostsAllNode[i] = (mapOutsOneSlave.get(0).mapCost + mapOutsOneSlave
 		    .get(0).mapScheduleCost)
 		    * mapOutsOneSlave.size()
-		    + (reduceCosts[reduceId] + reduceStatistics.get(reduceId).reduceCostStatistics.csSheduleCost)
+		    + (reduceCosts[reduceId] + reduceStatistics.get(reduceId).reduceCostStatistics.csScheduleCost)
 		    * reduceWaves;
 
 	}

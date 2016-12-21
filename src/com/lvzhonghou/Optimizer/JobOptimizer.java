@@ -133,7 +133,7 @@ public class JobOptimizer {
 	
 	System.out.println("-------------------------------");
 	System.out.println("the reduce cost statistics are shown as follows.");
-	System.out.println("the reduce's csSheduleCost is " + reduceCostStatis.csSheduleCost);
+	System.out.println("the reduce's csSheduleCost is " + reduceCostStatis.csScheduleCost);
 	System.out.println("the reduce's initialCost is " + reduceCostStatis.initialCost);
 	System.out.println("the reduce's csShuffleInMem is " + reduceCostStatis.csShuffleInMem);
 	System.out.println("the reduce's csShuffleOnDisk is " + reduceCostStatis.csShuffleOnDisk);

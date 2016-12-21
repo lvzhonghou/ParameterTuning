@@ -11,7 +11,7 @@ import java.io.Serializable;
 public class ReduceCostStatistics implements Serializable{
     private static final long serialVersionUID = -5240152692961888097L;
     
-    public double csSheduleCost;  //reduce task的调度开销
+    public double csScheduleCost;  //reduce task的调度开销
     
     public double initialCost;   //初始化
     

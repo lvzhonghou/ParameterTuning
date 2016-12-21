@@ -19,8 +19,10 @@ public class TestReflection {
      * @param args  
      * @throws SecurityException 
      * @throws NoSuchFieldException 
+     * @throws IllegalAccessException 
+     * @throws IllegalArgumentException 
      */
-    public static void main(String[] args) throws NoSuchFieldException, SecurityException {
+    public static void main(String[] args) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
 	// TODO Auto-generated method stub
 	Class clazz = MapTaskParameters.class;
 	
@@ -41,6 +43,13 @@ public class TestReflection {
 	} else if(type.endsWith("boolean") || type.endsWith("Boolean")) {
 	    System.out.println("this type is boolean");
 	}
+	
+	MapTaskParameters parameters = new MapTaskParameters();
+	Class clazz2 = parameters.getClass();
+	Field field1 = clazz2.getDeclaredField("pSplitSize");
+	field1.set(parameters, 1.0);
+	double ret = field1.getDouble(parameters);
+	System.out.println(ret);
     }
 
 }
